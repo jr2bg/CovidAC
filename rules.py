@@ -33,13 +33,13 @@ def s_2_e(p_E, npa, ng, arr_population):
     for r,c in ng:
         #print(r,c)
         if arr_population[r][c] == 2 or arr_population[r][c] == 3:
-            print("r: ", r,"   c: ",c, "   valor: ",arr_population[r][c])
+            #print("r: ", r,"   c: ",c, "   valor: ",arr_population[r][c])
             cnt += 1
 
     if npa <= p_E * cnt:
         #t = 0
-        print("npa:\t", npa, "\tproducto probs:\t", p_E*cnt)
-        print(ng)
+        #print("npa:\t", npa, "\tproducto probs:\t", p_E*cnt)
+        #print(ng)
         return 2 # pasa a Expuesto
     #t += 1
     return 1    # queda en Suceptible
@@ -122,7 +122,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     función de evolución, cambia los array
     '''
     cnt = [0 for i in range(6)]
-    print("PUNTEROS?? ", id (arr_population) == id(arr_evo))
+    #print("PUNTEROS?? ", id (arr_population) == id(arr_evo))
     # diccionario para almacenar los cambios de uno a otro
     d_changes = {2:[], 3:[], 4:[], 5:[]}
 
@@ -141,7 +141,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
                 nv = s_2_e(d_params["p_E"], npa, ng, arr_population)
                 if nv == 2:
                     cnt[0] += 1
-                    print(i,j," despues:   ", arr_population[i][j])
+                    #print(i,j," despues:   ", arr_population[i][j])
                     d_changes[nv].append((i,j))
 
             # si es expuesto
@@ -151,6 +151,8 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
                 nv = e_2_i(d_params["p_I"], npa, d_params["t_I"], arr_tiempo[i][j])
                 if nv != 2:
                     d_changes[nv].append((i,j))
+                else:
+                    arr_tiempo[i][j] += 1
 
             # si es infectado
             elif arr_population[i][j] == 3:
@@ -158,22 +160,28 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
                 nv = i_2qr(d_params["p_Q"], d_params["p_R"], npa, d_params["t_Q"], d_params["t_R"], arr_tiempo[i][j])
                 if nv != 3:
                     d_changes[nv].append((i,j))
+                else:
+                    arr_tiempo[i][j] += 1
 
             # si está en cuarentena
             elif arr_population[i][j] == 4:
                 npa = random.uniform(0,1)
                 nv = q_2_r(d_params["p_R"], npa, d_params["t_R"], arr_tiempo[i][j])
                 if nv != 4:
-                    d_changes.append((i,j))
+                    d_changes[nv].append((i,j))
+                else:
+                    arr_tiempo[i][j] += 1
 
             # recuperados o casillas vacías
             else:
                 nv = arr_population[i][j]
+                arr_tiempo[i][j] += 1
 
             ############## Fin de las REGLAS
     for key, value in d_changes.items():
         for r,c in value:
             arr_population[r][c] = key
+            arr_tiempo[r][c] = 0
             # # si pasa a otro estado
             # if nv != arr_population[i][j]:
             #     #cnt[nv] += 1
@@ -198,7 +206,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     # arr_evo = tmp_p
     #for i in range(6):
     #    print(i , cnt[i] ,end=" ")
-    print("expuestos_inicio:\t",cnt[2], "\tnuevos_expuestos:\t",cnt[0])
+    #print("expuestos_inicio:\t",cnt[2], "\tnuevos_expuestos:\t",cnt[0])
 
 
 
@@ -206,10 +214,10 @@ def iterations():
     '''
     PROGRAMA PRINCIPAL
     '''
-    sz_r = 7
-    sz_c = 7
-    D = 1
-    n_cycles = 2
+    sz_r = 400
+    sz_c = 400
+    D = 0.5
+    n_cycles = 100
 
     # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
     p_E =  0.5
@@ -231,14 +239,14 @@ def iterations():
     arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
 
     #### población infectada o expuesta al tiempo 0
-    #pop_i0 = habs[:I_int]
-    #pop_e0 = habs[I_int: E_int + I_int]
-    pop_i0 = [(0,0)]
-    pop_e0 = [(6,6)]
-    print(len(pop_i0))
-    print(len(pop_e0))
-    print(pop_i0)
-    print(pop_e0)
+    pop_i0 = habs[:I_int]
+    pop_e0 = habs[I_int: E_int + I_int]
+    #pop_i0 = [(0,0)]
+    #pop_e0 = [(2,2)]
+    #print(len(pop_i0))
+    #print(len(pop_e0))
+    #print(pop_i0)
+    #print(pop_e0)
 
 
     for r,c in pop_i0:
@@ -249,7 +257,7 @@ def iterations():
 
     arr_evo = arr_population.copy()
     arr_nt = arr_tiempo.copy()
-    print("PUNTEROS IGUALES?   ",id(arr_population) == id(arr_evo))
+    #print("PUNTEROS IGUALES?   ",id(arr_population) == id(arr_evo))
 
     #### tiempo primer infectado ---> t_fi
     t_fi = 0

@@ -6,15 +6,16 @@ import csv
 
 import random
 
-def f_getNeigh(sz_r, sz_c,r,c):
+def f_getNeigh(sz_r, sz_c,r,c,d):
     '''
     función que da la vecindad para el elemento ubicado en
     la fila r y columna c
     sz_r y sz_c corresponden al tamaño del array
+    d -> radio de la esfera de influencia
     '''
     ng = []
-    for i in range(-1,2):
-        for j in range(-1,2):
+    for i in range(-d, d +1):
+        for j in range(-d, d+1):
             if r + i >= 0 and r + i < sz_r and c + j>= 0 and c + j < sz_c and \
                 not (i == 0 and j == 0):
                 ng.append((r+i,c+j))
@@ -133,8 +134,10 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
 
             # si es suceptible
             if arr_population[i][j] == 1:
+
+                d = d_params["d"] if d_params["t"] <= d_params["t_L"] else 0
                 # obtenemos vecindad
-                ng = f_getNeigh(sz_r, sz_c,i,j)
+                ng = f_getNeigh(sz_r, sz_c,i,j, d)
 
                 # obtenemos el popsible cambio
                 npa = random.uniform(0,1)
@@ -227,9 +230,12 @@ def iterations():
     t_Q =  2
     p_R = 0.12
     t_R = 18
+    d = 3
+    t_L = 4
 
     d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
-                "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R}
+                "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
+                 "t_L" : t_L, "t":0}
 
     # personas infectadas y expuestas al principio
     I_int = 6
@@ -279,6 +285,7 @@ def iterations():
 
     for c in range(1,n_cycles):
         print(c)
+        d_params["t"] = c
         f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
         # for i in range(sz_r):
         #     for j in range(sz_c):

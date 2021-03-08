@@ -3,6 +3,7 @@ import matplotlib.animation as animation
 from matplotlib.colors import ListedColormap
 
 import csv
+import pandas as pd
 
 import random
 
@@ -185,31 +186,34 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
         for r,c in value:
             arr_population[r][c] = key
             arr_tiempo[r][c] = 0
-            # # si pasa a otro estado
-            # if nv != arr_population[i][j]:
-            #     #cnt[nv] += 1
-            #     arr_nt[i][j] = 0
-            #     arr_evo[i][j] = nv
-            #
-            # # mientras no sea una casilla en blanco, vacía, estado 0
-            # elif arr_population[i][j] != 0:
-            #     #cnt[arr_population[i][j]] += 1
-            #     arr_nt[i][j] = arr_tiempo[i][j] + 1
-            #     arr_evo[i][j] = arr_population[i][j]
+
+def data_fig3a(n_habs , d_cont,arr_population):
+    s = 0
+    e = 0
+    i = 0
+    q = 0
+    r = 0
+    for rw in arr_population:
+        for val in rw:
+            if val == 1:
+                s += 1
+            elif val == 2:
+                e += 1
+            elif val == 3:
+                i += 1
+            elif val == 4:
+                q += 1
+            elif val == 5:
+                r += 1
+    d_cont["s"].append(s / n_habs)
+    d_cont["e"].append(e / n_habs)
+    d_cont["i"].append(i / n_habs)
+    d_cont["q"].append(q / n_habs)
+    d_cont["r"].append(r / n_habs)
+
+    return d_cont
 
 
-    # actualización de los array a considerar
-    # tmp_t = arr_tiempo
-    # tmp_p = arr_population
-    #
-    # arr_tiempo = arr_nt
-    # arr_population = arr_evo
-    #
-    # arr_nt = tmp_t
-    # arr_evo = tmp_p
-    #for i in range(6):
-    #    print(i , cnt[i] ,end=" ")
-    #print("expuestos_inicio:\t",cnt[2], "\tnuevos_expuestos:\t",cnt[0])
 
 
 
@@ -219,19 +223,19 @@ def iterations():
     '''
     sz_r = 400
     sz_c = 400
-    D = 0.5
+    D = 0.46
     n_cycles = 100
 
     # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
     p_E =  0.5
     p_I =  0.5
-    t_I = 8
-    p_Q =  0.1
-    t_Q =  2
+    t_I = 8     ####
+    p_Q =  1.
+    t_Q =  2    ####
     p_R = 0.12
     t_R = 18
-    d = 3
-    t_L = 4
+    d = 2
+    t_L = 15
 
     d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
                 "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
@@ -243,6 +247,8 @@ def iterations():
 
     arr_population, habs = f_initPop(sz_r, sz_c, D)
     arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
+
+    n_habs = len(habs)
 
     #### población infectada o expuesta al tiempo 0
     pop_i0 = habs[:I_int]
@@ -277,83 +283,49 @@ def iterations():
     fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
     plots = []
 
+    ##### Fig 3a
+    # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
+    d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
+              "e": [E_int/n_habs],
+              "i":[I_int/n_habs],
+              "q": [0],
+              "r": [0]}
+
+    ####
     plt.axis('off')
     img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
     plots.append([img])
-    frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
-    time.append(c)
+    #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+    time.append(0)
 
     for c in range(1,n_cycles):
         print(c)
         d_params["t"] = c
         f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
-        # for i in range(sz_r):
-        #     for j in range(sz_c):
-        #
-        #         ############## Reglas
-        #
-        #         # si es suceptible
-        #         if arr_population[i][j] == 1:
-        #             # obtenemos vecindad
-        #             ng = f_getNeigh(sz_r, sz_c,i,j)
-        #
-        #             # obtenemos el popsible cambio
-        #             npa = random.uniform(0,1)
-        #             nv = s_2_e(p_E, npa, ng, arr_population)
-        #
-        #         # si es expuesto
-        #         elif arr_population[i][j] == 2:
-        #             npa = random.uniform(0,1)
-        #             nv = e_2_i(p_I, npa, t_I, arr_tiempo[i][j])
-        #
-        #         # si es infectado
-        #         elif arr_population[i][j] == 3:
-        #             npa = random.uniform(0,1)
-        #             nv = i_2qr(p_Q, p_R, npa, t_Q, t_R, arr_tiempo[i][j])
-        #
-        #         # si está en cuarentena
-        #         elif arr_population[i][j] == 4:
-        #             npa = random.uniform(0,1)
-        #             nv = q_2_r(p_R, npa, t_R, arr_tiempo[i][j])
-        #
-        #         else:
-        #             nv = 0
-        #
-        #         ############## Fin de las REGLAS
-        #
-        #         # si pasa a otro estado
-        #         if nv != arr_population[i][j]:
-        #             arr_nt[i][j] = 0
-        #             arr_evo[i][j] = nv
-        #
-        #         # mientras no sea una casilla en blanco, vacía, estado 0
-        #         elif arr_population[i][j] != 0:
-        #             arr_nt[i][j] = arr_tiempo[i][j] + 1
-        #             arr_evo[i][j] = arr_population[i][j]
-        #
-        # #actualización de los array a considerar
-        # #arr_tiempo = arr_nt.copy()
-        # #arr_population = arr_evo.copy()
-        # arr_tiempo = arr_nt
-        # arr_population = arr_evo
 
-        # pygame
         plt.axis('off')
         img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
         plots.append([img])
-        frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+        #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+
+        d_cont = data_fig3a(n_habs , d_cont, arr_population)
+
         time.append(c)
 
     # enviar datos a la carpeta de interés
-    file_str = "exportedData/i_vs_t_{p_Q}p_Q.csv".format(p_Q = p_Q)
-    #d_exp = {"i" = frac_pers_i, "t" = time}
+    file_str = "exportedData/Fig3a.csv"
+    d_cont["t"] = time
+    df = pd.DataFrame(d_cont)
+    df.to_csv(file_str)
+    df.plot(x = "t", y = ["s","e","i","q","r"], color = ["blue", "green", "red", "cyan", "yellow"])
+    plt.show()
 
-    with open(file_str, mode = "w") as f:
-        to_exp = zip(frac_pers_i,time)
-        wrtr = csv.writer(f, delimiter = ",")
-
-        wrtr.writerow(["i", "t"])
-        wrtr.writerows(to_exp)
+    # with open(file_str, mode = "w") as f:
+    #     to_exp = zip(frac_pers_i,time)
+    #     wrtr = csv.writer(f, delimiter = ",")
+    #
+    #     wrtr.writerow(["i", "t"])
+    #     wrtr.writerows(to_exp)
     print("\n----------- ARCHIVO GENERADO-----------\n")
     # generar la animación chingona nononono
     ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,

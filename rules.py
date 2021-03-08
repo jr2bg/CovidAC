@@ -33,17 +33,11 @@ def s_2_e(p_E, npa, ng, arr_population):
     '''
     cnt = 0
     for r,c in ng:
-        #print(r,c)
         if arr_population[r][c] == 2 or arr_population[r][c] == 3:
-            #print("r: ", r,"   c: ",c, "   valor: ",arr_population[r][c])
             cnt += 1
 
     if npa <= p_E * cnt:
-        #t = 0
-        #print("npa:\t", npa, "\tproducto probs:\t", p_E*cnt)
-        #print(ng)
         return 2 # pasa a Expuesto
-    #t += 1
     return 1    # queda en Suceptible
 
 
@@ -57,9 +51,7 @@ def e_2_i(p_I, npa, t_I, t):
     '''
 
     if t_I <= t and npa <= p_I:
-        #t = 0
         return 3
-    #t += 1
     return 2
 
 
@@ -76,13 +68,11 @@ def i_2qr(p_Q, p_R, npa, t_Q, t_R, t):
     '''
 
     if t_Q <= t and npa <= p_Q:
-        #t = 0
         return 4
+
     if t_R <= t and npa <= p_R:
-        #t = 0
         return 5
 
-    #t += 1
     return 3
 
 
@@ -109,7 +99,7 @@ def f_initPop(sz_r, sz_c, D):
 
     # se eligen t_pop celdas de arr_population para que sean los habitantes
     lst = [(r,c) for c in range(sz_c) for r in range(sz_r)]
-    #print(t_pop)
+
     habs = random.sample(lst, t_pop)
 
     # todos los habitantes son suceptibles en el arreglo de la población
@@ -124,7 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     función de evolución, cambia los array
     '''
     cnt = [0 for i in range(6)]
-    #print("PUNTEROS?? ", id (arr_population) == id(arr_evo))
+
     # diccionario para almacenar los cambios de uno a otro
     d_changes = {2:[], 3:[], 4:[], 5:[]}
 
@@ -145,7 +135,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
                 nv = s_2_e(d_params["p_E"], npa, ng, arr_population)
                 if nv == 2:
                     cnt[0] += 1
-                    #print(i,j," despues:   ", arr_population[i][j])
+
                     d_changes[nv].append((i,j))
 
             # si es expuesto
@@ -223,117 +213,124 @@ def iterations():
     '''
     sz_r = 400
     sz_c = 400
-    D = 0.46
+    l_D = [0.01 *i**2 for i in range(1, 11)]
+    #l_D = [1]
+    l_d = [1,2]
     n_cycles = 100
+    imx_1 = []
+    imx_2 = []
 
-    # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
-    p_E =  0.5
-    p_I =  0.5
-    t_I = 8     ####
-    p_Q =  1.
-    t_Q =  2    ####
-    p_R = 0.12
-    t_R = 18
-    d = 2
-    t_L = 15
+    #####
+    for D in l_D:
+        for d in l_d:
+            print("\n----- D:\t", D, "\td:\t", d , "-----" )
+    ##############################
+            # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
+            p_E =  0.5
+            p_I =  0.5
+            t_I = 8     ####
+            p_Q =  1.
+            t_Q =  2    ####
+            p_R = 0.12
+            t_R = 18
+            #d = 2
+            t_L = 15
 
-    d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
-                "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
-                 "t_L" : t_L, "t":0}
+            d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
+                        "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
+                         "t_L" : t_L, "t":0}
 
-    # personas infectadas y expuestas al principio
-    I_int = 6
-    E_int = 200
+            # personas infectadas y expuestas al principio
+            I_int = 6
+            E_int = 200
 
-    arr_population, habs = f_initPop(sz_r, sz_c, D)
-    arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
+            arr_population, habs = f_initPop(sz_r, sz_c, D)
+            arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
 
-    n_habs = len(habs)
+            n_habs = len(habs)
 
-    #### población infectada o expuesta al tiempo 0
-    pop_i0 = habs[:I_int]
-    pop_e0 = habs[I_int: E_int + I_int]
-    #pop_i0 = [(0,0)]
-    #pop_e0 = [(2,2)]
-    #print(len(pop_i0))
-    #print(len(pop_e0))
-    #print(pop_i0)
-    #print(pop_e0)
+            #### población infectada o expuesta al tiempo 0
+            pop_i0 = habs[:I_int]
+            pop_e0 = habs[I_int: E_int + I_int]
 
 
-    for r,c in pop_i0:
-        arr_population[r][c] = 3
-    for r,c in pop_e0:
-        arr_population[r][c] = 2
-    ####
 
-    arr_evo = arr_population.copy()
-    arr_nt = arr_tiempo.copy()
-    #print("PUNTEROS IGUALES?   ",id(arr_population) == id(arr_evo))
+            for r,c in pop_i0:
+                arr_population[r][c] = 3
+            for r,c in pop_e0:
+                arr_population[r][c] = 2
+            ####
 
-    #### tiempo primer infectado ---> t_fi
-    t_fi = 0
+            arr_evo = arr_population.copy()
+            arr_nt = arr_tiempo.copy()
 
-    #### gráficas
-    frac_pers_i = []
-    time = []
+            #### tiempo primer infectado ---> t_fi
+            t_fi = 0
 
-    #### ANIMACION
-    cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
-    fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
-    plots = []
+            #### gráficas
+            #frac_pers_i = []
+            #time = []
 
-    ##### Fig 3a
-    # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
-    d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
-              "e": [E_int/n_habs],
-              "i":[I_int/n_habs],
-              "q": [0],
-              "r": [0]}
+            #### ANIMACION
+            #cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
+            #fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
+            #plots = []
 
-    ####
-    plt.axis('off')
-    img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
-    plots.append([img])
-    #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
-    time.append(0)
+            ##### Fig 3a
+            # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
+            d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
+                      "e": [E_int/n_habs],
+                      "i":[I_int/n_habs],
+                      "q": [0],
+                      "r": [0]}
 
-    for c in range(1,n_cycles):
-        print(c)
-        d_params["t"] = c
-        f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
+            ####
+            #plt.axis('off')
+            #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
+            #plots.append([img])
+            #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+            #time.append(0)
 
-        plt.axis('off')
-        img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
-        plots.append([img])
-        #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
 
-        d_cont = data_fig3a(n_habs , d_cont, arr_population)
 
-        time.append(c)
+
+            for c in range(1,n_cycles):
+                print(c)
+                d_params["t"] = c
+                f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
+
+                #plt.axis('off')
+                #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
+                #plots.append([img])
+                #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+
+                d_cont = data_fig3a(n_habs , d_cont, arr_population)
+
+                #time.append(c)
+            if d == 1:
+                imx_1.append(max(d_cont["i"]))
+            else:
+                imx_2.append(max(d_cont["i"]))
+        ######################################
 
     # enviar datos a la carpeta de interés
-    file_str = "exportedData/Fig3a.csv"
-    d_cont["t"] = time
-    df = pd.DataFrame(d_cont)
+    file_str = "exportedData/Fig3b.csv"
+    #d_cont["t"] = time
+    df = pd.DataFrame({"D": l_D, "imx_1":imx_1, "imx_2":imx_2})
     df.to_csv(file_str)
-    df.plot(x = "t", y = ["s","e","i","q","r"], color = ["blue", "green", "red", "cyan", "yellow"])
+    df.plot(x = "D", y = ["imx_1", "imx_2"], color = ["red", "yellow"])
+    #df.plot(x = "t", y = ["s","e","i","q","r"], color = ["blue", "green", "red", "cyan", "yellow"])
     plt.show()
-    print(max(d_cont["i"]))
+    #print(max(d_cont["i"]))
 
-    # with open(file_str, mode = "w") as f:
-    #     to_exp = zip(frac_pers_i,time)
-    #     wrtr = csv.writer(f, delimiter = ",")
-    #
-    #     wrtr.writerow(["i", "t"])
-    #     wrtr.writerows(to_exp)
     print("\n----------- ARCHIVO GENERADO-----------\n")
-    # generar la animación chingona nononono
-    ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
-                                    repeat_delay=1000)
-    Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    ani.save("evolucion_COVID.mp4", writer = writer)
+
+    # # generar la animación chingona nononono
+    # ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
+    #                                 repeat_delay=1000)
+    # Writer = animation.writers['ffmpeg']
+    # writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+    # ani.save("evolucion_COVID.mp4", writer = writer)
 
 if __name__ == "__main__":
     iterations()

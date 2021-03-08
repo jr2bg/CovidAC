@@ -319,6 +319,7 @@ def iterations():
     df.to_csv(file_str)
     df.plot(x = "t", y = ["s","e","i","q","r"], color = ["blue", "green", "red", "cyan", "yellow"])
     plt.show()
+    print(max(d_cont["i"]))
 
     # with open(file_str, mode = "w") as f:
     #     to_exp = zip(frac_pers_i,time)

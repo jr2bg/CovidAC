@@ -114,6 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     '''
     función de evolución, cambia los array
     '''
+    d_params["t"] += 1
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro
@@ -314,6 +315,14 @@ def iterations():
             time.append(c)
         d_data["t_L=" + str(t_L)] = d_cont["i"]
 
+        #######
+        # # generar la animación
+        # ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
+        #                                 repeat_delay=1000)
+        # Writer = animation.writers['ffmpeg']
+        # writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+        # ani.save("evolucion_tL_{}.mp4".format(t_L), writer = writer)
+
     ######################################
 
     # enviar datos a la carpeta de interés
@@ -321,7 +330,7 @@ def iterations():
     d_data["t"] = time
     df = pd.DataFrame(d_data)
     df.to_csv(file_str)
-
+    
     # consideraremos solo ciertas llaves de interés, no todas, para el plot
     # relevant keys
     r_ks = list(d_data.keys())
@@ -333,12 +342,7 @@ def iterations():
 
     print("\n----------- ARCHIVO GENERADO-----------\n")
 
-    # # generar la animación
-    # ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
-    #                                 repeat_delay=1000)
-    # Writer = animation.writers['ffmpeg']
-    # writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    # ani.save("evolucion_d_{}.mp4".format(d), writer = writer)
+
 
 if __name__ == "__main__":
     iterations()

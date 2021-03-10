@@ -114,6 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     '''
     función de evolución, cambia los array
     '''
+    d_params["t"] += 1
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro

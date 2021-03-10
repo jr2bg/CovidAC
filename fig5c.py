@@ -114,6 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     '''
     función de evolución, cambia los array
     '''
+    d_params["t"] += 1
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro
@@ -225,7 +226,7 @@ def iterations():
 
     # inicialización del dic con los valores a considerar
     for i in range(5):
-        d_data[str(l_p_E[i])] = []
+        d_data["p_E="+str(l_p_E[i])] = []
 
     #####
     for p_E in l_p_E:
@@ -314,7 +315,7 @@ def iterations():
             time.append(c)
 
         # nos interesa la razón de infectados
-        d_data[str(p_E)] = d_cont["i"]
+        d_data["p_E="+str(p_E)] = d_cont["i"]
 
     ######################################
 

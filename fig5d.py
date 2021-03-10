@@ -114,6 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     '''
     función de evolución, cambia los array
     '''
+    d_params["t"] += 1
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro
@@ -226,7 +227,7 @@ def iterations():
 
     # inicialización del dic con los valores a considerar
     for i in range(5):
-        d_data[str(l_p_I[i])] = []
+        d_data["p_I="+str(l_p_I[i])] = []
 
     #####
     #for D in l_D:
@@ -313,7 +314,7 @@ def iterations():
             d_cont = data_fig3a(n_habs , d_cont, arr_population)
 
             time.append(c)
-        d_data[str(p_I)] = d_cont["i"]
+        d_data["p_I="+str(p_I)] = d_cont["i"]
 
     ######################################
 

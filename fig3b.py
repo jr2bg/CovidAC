@@ -14,10 +14,9 @@ def f_getNeigh(sz_r, sz_c,r,c,d):
     sz_r y sz_c corresponden al tamaño del array
     d -> radio de la esfera de influencia
     '''
-    rd = random.randint(0,d)
     ng = []
-    for i in range(-rd, rd +1):
-        for j in range(-rd, rd+1):
+    for i in range(-d, d +1):
+        for j in range(-d, d+1):
             if r + i >= 0 and r + i < sz_r and c + j>= 0 and c + j < sz_c and \
                 not (i == 0 and j == 0):
                 ng.append((r+i,c+j))
@@ -214,124 +213,120 @@ def iterations():
     '''
     sz_r = 400
     sz_c = 400
-    #l_D = [0.01 *i**2 for i in range(1, 11)]
-    D = 0.46
-    l_d = [1,3]
+    l_D = [0.01 *i**2 for i in range(1, 11)]
+    l_d = [1,2]
     n_cycles = 100
     imx_1 = []
     imx_2 = []
 
     #####
-    #for D in l_D:
-    for d in l_d:
-        #print("\n----- D:\t", D, "\td:\t", d , "-----" )
-    ##############################
-        # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
-        p_E =  0.5
-        p_I =  0.5
-        t_I = 8     ####
-        p_Q =  0.1
-        t_Q =  2    ####
-        p_R = 0.12
-        t_R = 18
-        #d = 2
-        t_L = 15
+    for D in l_D:
+        for d in l_d:
+            print("\n----- D:\t", D, "\td:\t", d , "-----" )
+        ##############################
+            # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
+            p_E =  0.5
+            p_I =  0.5
+            t_I = 8     ####
+            p_Q =  0.1
+            t_Q =  2    ####
+            p_R = 0.12
+            t_R = 18
+            #d = 2
+            t_L = 15
 
-        d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
-                    "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
-                     "t_L" : t_L, "t":0}
+            d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
+                        "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
+                         "t_L" : t_L, "t":0}
 
-        # personas infectadas y expuestas al principio
-        I_int = 6
-        E_int = 200
+            # personas infectadas y expuestas al principio
+            I_int = 6
+            E_int = 200
 
-        arr_population, habs = f_initPop(sz_r, sz_c, D)
-        arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
+            arr_population, habs = f_initPop(sz_r, sz_c, D)
+            arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
 
-        n_habs = len(habs)
+            n_habs = len(habs)
 
-        #### población infectada o expuesta al tiempo 0
-        pop_i0 = habs[:I_int]
-        pop_e0 = habs[I_int: E_int + I_int]
-
-
-
-        for r,c in pop_i0:
-            arr_population[r][c] = 3
-        for r,c in pop_e0:
-            arr_population[r][c] = 2
-        ####
-
-        arr_evo = arr_population.copy()
-        arr_nt = arr_tiempo.copy()
-
-        #### tiempo primer infectado ---> t_fi
-        t_fi = 0
-
-        #### gráficas
-        #frac_pers_i = []
-        time = []
-
-        #### ANIMACION
-        cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
-        fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
-        plots = []
-
-        ##### Fig 3a
-        # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
-        d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
-                  "e": [E_int/n_habs],
-                  "i":[I_int/n_habs],
-                  "q": [0],
-                  "r": [0]}
-
-        ####
-        plt.axis('off')
-        img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
-        plots.append([img])
-        #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
-        time.append(0)
+            #### población infectada o expuesta al tiempo 0
+            pop_i0 = habs[:I_int]
+            pop_e0 = habs[I_int: E_int + I_int]
 
 
 
+            for r,c in pop_i0:
+                arr_population[r][c] = 3
+            for r,c in pop_e0:
+                arr_population[r][c] = 2
+            ####
 
-        for c in range(1,n_cycles):
-            print(c)
-            d_params["t"] = c
-            f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
+            arr_evo = arr_population.copy()
+            arr_nt = arr_tiempo.copy()
 
-            plt.axis('off')
-            img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
-            plots.append([img])
+            #### tiempo primer infectado ---> t_fi
+            t_fi = 0
+
+            #### gráficas
+            #frac_pers_i = []
+            #time = []
+
+            #### ANIMACION
+            #cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
+            #fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
+            #plots = []
+
+            ##### Fig 3a
+            # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
+            d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
+                      "e": [E_int/n_habs],
+                      "i":[I_int/n_habs],
+                      "q": [0],
+                      "r": [0]}
+
+            ####
+            #plt.axis('off')
+            #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
+            #plots.append([img])
             #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+            #time.append(0)
 
-            d_cont = data_fig3a(n_habs , d_cont, arr_population)
 
-            time.append(c)
-        #if d == 1:
-        #    imx_1.append(max(d_cont["i"]))
-        #else:
-        #    imx_2.append(max(d_cont["i"]))
-    ######################################
 
-        # enviar datos a la carpeta de interés
-        #file_str = "exportedData/Fig4.csv"
-        #d_cont["t"] = time
-        #df = pd.DataFrame({"D": l_D, "imx_1":imx_1, "imx_2":imx_2})
-        #df.to_csv(file_str)
-        #df.plot(x = "D", y = ["imx_1", "imx_2"], color = ["red", "yellow"])
-        #df.plot(x = "t", y = ["s","e","i","q","r"], color = ["blue", "green", "red", "cyan", "yellow"])
-        #plt.show()
-        #print(max(d_cont["i"]))
 
-        #print("\n----------- ARCHIVO GENERADO-----------\n")
+            for c in range(1,n_cycles):
+                print(c)
+                f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
 
-        # # generar la animación
-        ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
-                                        repeat_delay=1000)
-        Writer = animation.writers['ffmpeg']
-        writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-        ani.save("evolucion_d_{}.mp4".format(d), writer = writer)
+                #plt.axis('off')
+                #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
+                #plots.append([img])
+                #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+
+                d_cont = data_fig3a(n_habs , d_cont, arr_population)
+
+                #time.append(c)
+            if d == 1:
+                imx_1.append(max(d_cont["i"]))
+            else:
+                imx_2.append(max(d_cont["i"]))
+        ######################################
+
+    # enviar datos a la carpeta de interés
+    file_str = "exportedData/Fig3b.csv"
+    #d_cont["t"] = time
+    df = pd.DataFrame({"D": l_D, "imx_1":imx_1, "imx_2":imx_2})
+    df.to_csv(file_str)
+    df.plot(x = "D", y = ["imx_1", "imx_2"], color = ["red", "yellow"])
+    plt.show()
+
+    print("\n----------- ARCHIVO GENERADO-----------\n")
+
+    # # generar la animación
+    # ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,
+    #                                 repeat_delay=1000)
+    # Writer = animation.writers['ffmpeg']
+    # writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+    # ani.save("evolucion_d_{}.mp4".format(d), writer = writer)
 
 if __name__ == "__main__":
     iterations()

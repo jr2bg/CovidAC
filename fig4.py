@@ -127,7 +127,8 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
             # si es suceptible
             if arr_population[i][j] == 1:
 
-                d = d_params["d"] if d_params["t"] <= d_params["t_L"] else 0
+                #d = d_params["d"] if d_params["t"] <= d_params["t_L"] else 0
+                d = d_params["d"]
                 # obtenemos vecindad
                 ng = f_getNeigh(sz_r, sz_c,i,j, d)
 
@@ -214,17 +215,15 @@ def iterations():
     '''
     sz_r = 400
     sz_c = 400
-    #l_D = [0.01 *i**2 for i in range(1, 11)]
     D = 0.46
     l_d = [1,3]
     n_cycles = 100
-    imx_1 = []
-    imx_2 = []
+    #imx_1 = []
+    #imx_2 = []
 
     #####
-    #for D in l_D:
+
     for d in l_d:
-        #print("\n----- D:\t", D, "\td:\t", d , "-----" )
     ##############################
         # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
         p_E =  0.5

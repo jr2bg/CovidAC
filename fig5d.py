@@ -226,7 +226,7 @@ def iterations():
 
     # inicialización del dic con los valores a considerar
     for i in range(5):
-        d_data[str(l_p_I[i])] = {}
+        d_data[str(l_p_I[i])] = []
 
     #####
     #for D in l_D:

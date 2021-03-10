@@ -222,25 +222,26 @@ def iterations():
 
     d_data = {}
 
-    l_t_L = [1,5,10,15,20]
+    l_t_Q = [1 , 5 , 10 , 15 , 20]
+
+    # inicialización del dic con los valores a considerar
     for i in range(5):
-        d_data["t_L=" + str(l_t_L[i])] = []
+        d_data["t_q=" + str(l_t_Q[i])] = []
 
     #####
     #for D in l_D:
-    for t_L in l_t_L:
-        #print("\n----- D:\t", D, "\td:\t", d , "-----" )
+    for t_Q in l_t_Q:
     ##############################
         # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
         p_E =  0.5
         p_I =  0.5
         t_I = 8     ####
         p_Q =  0.1
-        t_Q =  2    ####
+        #t_Q =  2    ####
         p_R = 0.12
         t_R = 18
         #d = 2
-        #t_L = 15
+        t_L = 15
 
         d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
                     "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
@@ -312,12 +313,12 @@ def iterations():
             d_cont = data_fig3a(n_habs , d_cont, arr_population)
 
             time.append(c)
-        d_data["t_L=" + str(t_L)] = d_cont["i"]
+        d_data["t_q=" + str(t_Q)] = d_cont["i"]
 
     ######################################
 
     # enviar datos a la carpeta de interés
-    file_str = "exportedData/Fig5a.csv"
+    file_str = "exportedData/Fig6c.csv"
     d_data["t"] = time
     df = pd.DataFrame(d_data)
     df.to_csv(file_str)
@@ -327,7 +328,7 @@ def iterations():
     r_ks = list(d_data.keys())
     r_ks.remove("t")
 
-    df.plot(x = "t", y = r_ks , color = ["red", "blue", "lime", "cyan", "green"])
+    df.plot(x = "t", y = r_ks, color = ["red", "blue", "lime", "cyan", "green"])
     plt.show()
     #print(max(d_cont["i"]))
 

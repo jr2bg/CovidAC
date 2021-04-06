@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.colors import ListedColormap
+from math import inf
 
 import csv
 import pandas as pd
@@ -113,6 +114,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
     '''
     función de evolución, cambia los array
     '''
+    #d_params["t"] += 1
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro
@@ -214,6 +216,7 @@ def iterations():
     sz_r = 400
     sz_c = 400
     l_D = [0.01 *i**2 for i in range(1, 11)]
+    #l_D = [0.04, 0.4, 0.8]
     l_d = [1,2]
     n_cycles = 100
     imx_1 = []
@@ -233,7 +236,7 @@ def iterations():
             p_R = 0.12
             t_R = 18
             #d = 2
-            t_L = 15
+            t_L = inf
 
             d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
                         "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
@@ -315,6 +318,7 @@ def iterations():
     file_str = "exportedData/Fig3b.csv"
     #d_cont["t"] = time
     df = pd.DataFrame({"D": l_D, "imx_1":imx_1, "imx_2":imx_2})
+    df = df[(df["D"]<= 0.5) & (df["D"] > 0.05) ]
     df.to_csv(file_str)
     df.plot(x = "D", y = ["imx_1", "imx_2"], color = ["red", "yellow"])
     plt.show()

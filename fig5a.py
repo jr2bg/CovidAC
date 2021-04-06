@@ -127,7 +127,7 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
 
             # si es suceptible
             if arr_population[i][j] == 1:
-
+                # radio max de la esfera de influencia
                 d = d_params["d"] if d_params["t"] <= d_params["t_L"] else 1
                 # obtenemos vecindad
                 ng = f_getNeigh(sz_r, sz_c,i,j, d)
@@ -217,7 +217,7 @@ def iterations():
     sz_r = 400
     sz_c = 400
     #l_D = [0.01 *i**2 for i in range(1, 11)]
-    D = 0.46
+    D = 1 #0.46
     d = 2
     n_cycles = 100
 
@@ -330,13 +330,18 @@ def iterations():
     d_data["t"] = time
     df = pd.DataFrame(d_data)
     df.to_csv(file_str)
-    
+
     # consideraremos solo ciertas llaves de interés, no todas, para el plot
     # relevant keys
     r_ks = list(d_data.keys())
     r_ks.remove("t")
+    #ax, fig = plt.subplots()
 
-    df.plot(x = "t", y = r_ks , color = ["red", "blue", "lime", "cyan", "green"])
+    df.plot(x = "t", y = r_ks , xlabel = "tiempo (d)",
+            ylabel= "fracción de personas infectadas (i)",
+            title = "Fig 5a" ,
+            color = ["red", "blue", "lime", "cyan", "green"])
+
     plt.show()
     #print(max(d_cont["i"]))
 

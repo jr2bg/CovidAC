@@ -214,23 +214,19 @@ def iterations():
     '''
     PROGRAMA PRINCIPAL
     '''
-    sz_r = 400
-    sz_c = 400
-    #l_D = [0.01 *i**2 for i in range(1, 11)]
-    D = 0.46
-    d = 2
     n_cycles = 100
-
     d_data = {}
 
+    sz_r = 400
+    sz_c = 400
+    D = 0.25#0.46
+    d = 2
     l_t_Q = [1 , 5 , 10 , 15 , 20]
-
     # inicialización del dic con los valores a considerar
     for i in range(5):
         d_data["t_q=" + str(l_t_Q[i])] = []
 
     #####
-    #for D in l_D:
     for t_Q in l_t_Q:
     ##############################
         # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
@@ -329,7 +325,10 @@ def iterations():
     r_ks = list(d_data.keys())
     r_ks.remove("t")
 
-    df.plot(x = "t", y = r_ks, color = ["red", "blue", "lime", "cyan", "green"])
+    df.plot(x = "t", y = r_ks, xlabel = "tiempo (d)",
+            ylabel= "fracción de personas infectadas (i)",
+            title = "Fig 6c" ,
+            color = ["red", "blue", "lime", "cyan", "green"])
     plt.show()
     #print(max(d_cont["i"]))
 

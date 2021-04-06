@@ -14,14 +14,8 @@ def f_getNeigh(sz_r, sz_c,r,c,d):
     sz_r y sz_c corresponden al tamaño del array
     d -> radio de la esfera de influencia
     '''
-    # selección del radio de la esfera de influencia
-    #npa = random.uniform(0,1)
-    #rd = 1 if npa < 62 else 0
-    if d > 1: print("Valor diferente de d!!\td:\t",d);
     rd = random.randint(0,d)
     ng = []
-
-    # ciclo de identificación de las posiciones de la vecindad
     for i in range(-rd, rd +1):
         for j in range(-rd, rd+1):
             if r + i >= 0 and r + i < sz_r and c + j>= 0 and c + j < sz_c and \
@@ -76,8 +70,8 @@ def i_2qr(p_Q, p_R, npa, t_Q, t_R, t):
 
     if t_Q <= t and npa <= p_Q:
         return 4
-    # mejora de la condición para que pase a recuperado
-    if t_R <= t and p_Q < npa <= p_Q+p_R:
+
+    if t_R <= t and npa <= p_R:
         return 5
 
     return 3
@@ -99,9 +93,6 @@ def q_2_r(p_R, npa, t_R, t):
 def f_initPop(sz_r, sz_c, D):
     '''
     función para inicializar la población
-
-    consiste en entregar un arreglo de tamaño sz_r * sz_c, tal que tenga una
-    densidad de población D
     '''
     arr_population = [[0 for i in range(sz_c)] for j in range(sz_r)]
     # total de la población
@@ -122,19 +113,11 @@ def f_initPop(sz_r, sz_c, D):
 def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo):
     '''
     función de evolución, cambia los array
-
-    python pasa arrays por dirección, así que se pueden cambiar los valores
-    del array dentro de la función y los cambios permanecen
     '''
-
-    # incremento del tiempo en 1
     d_params["t"] += 1
-    # inicialización del array que contendrá el conteo de cada sección
     cnt = [0 for i in range(6)]
 
     # diccionario para almacenar los cambios de uno a otro
-    # las key representan que entra a ese estado, y en la lista asociada
-    # cada elemento es una tupla con la posición de la celda
     d_changes = {2:[], 3:[], 4:[], 5:[]}
 
     for i in range(sz_r):
@@ -145,7 +128,6 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
             # si es suceptible
             if arr_population[i][j] == 1:
 
-                # un lockdown corresponde a un valor de d: 0 <= d <= 1
                 d = d_params["d"] if d_params["t"] <= d_params["t_L"] else 1
                 # obtenemos vecindad
                 ng = f_getNeigh(sz_r, sz_c,i,j, d)
@@ -192,14 +174,11 @@ def f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_ev
                 arr_tiempo[i][j] += 1
 
             ############## Fin de las REGLAS
-
-    # como los cambios se almacenaron en un diccionario
-    # iteramos sobre los elementos y los cambiamos en el array de la población,
-    # además de inicializar el tiempo de estos cambios en cero
     for key, value in d_changes.items():
         for r,c in value:
             arr_population[r][c] = key
             arr_tiempo[r][c] = 0
+
 
 def data_fig3a(n_habs , d_cont,arr_population):
     s = 0
@@ -235,133 +214,129 @@ def iterations():
     '''
     PROGRAMA PRINCIPAL
     '''
-    n_cycles = 101
-    d_data = {}  # "E_int:"+str()+";I_int:"+str()
+    n_cycles = 100
+    d_data = {}
 
     sz_r = 400
     sz_c = 400
-    D = 0.22#0.46#1#0.46
-    # personas infectadas y expuestas al principio
-    l_I_int = [ 5 ,  10 ,  15 ,  20 ,  25 ]
-    l_E_int = [75 , 150 , 225 , 300 , 375 ]
+    #l_D = [0.01 *i**2 for i in range(1, 11)]
+    l_D = [0.22, 0.25 , 0.5 , 0.75 , 1]
+    d = 2
+    l_p_I = [0.01 , 0.05 , 0.1 , 0.5 , 1]
 
-    ## ciclo para inicializar listas vacías dentro del diccionario con datos
-    for i in range(5):
-        d_data["E_int:"+str(l_E_int[i])+";I_int:"+str(l_I_int[i])] = []
+    for D in l_D:
+        # inicialización del dic con los valores a considerar
+        for i in range(5):
+            d_data["p_I="+str(l_p_I[i])] = []
+        #####
+        for p_I in l_p_I:
+        ##############################
+            # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
+            p_E =  0.5
+            #p_I =  0.5
+            t_I = 8     ####
+            p_Q =  0.1
+            t_Q =  2    ####
+            p_R = 0.12
+            t_R = 18
+            #d = 2
+            t_L = 0
 
-    # hay 5 elementos en cada una de las listas
-    for i in range(5):
-    ##############################
-        # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
-        p_E =  0.5
-        p_I =  0.5
-        t_I = 8     ####
-        p_Q =  0.1
-        t_Q =  2    ####
-        p_R = 0.12
-        t_R = 18
-        d = 2
-        t_L = 0
+            d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
+                        "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
+                         "t_L" : t_L, "t":0}
 
-        d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
-                    "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
-                     "t_L" : t_L, "t":0}
+            # personas infectadas y expuestas al principio
+            I_int = 6
+            E_int = 200
 
-        # n_personas I o E corresponden a valores en la i-ésima entrada
-        # del arr correspondiente
-        I_int = l_I_int[i]
-        E_int = l_E_int[i]
+            arr_population, habs = f_initPop(sz_r, sz_c, D)
+            arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
 
-        arr_population, habs = f_initPop(sz_r, sz_c, D)
-        arr_tiempo = [[0 for i in range(sz_c)] for j in range(sz_r)]
+            n_habs = len(habs)
 
-        n_habs = len(habs)
-
-        #### población infectada o expuesta al tiempo 0
-        pop_i0 = habs[:I_int]
-        pop_e0 = habs[I_int: E_int + I_int]
-
-
-
-        for r,c in pop_i0:
-            arr_population[r][c] = 3
-        for r,c in pop_e0:
-            arr_population[r][c] = 2
-        ####
-
-        arr_evo = arr_population.copy()
-        arr_nt = arr_tiempo.copy()
-
-        #### tiempo primer infectado ---> t_fi
-        t_fi = 0
-
-        #### gráficas
-        #frac_pers_i = []
-        time = []
-
-        #### ANIMACION
-        cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
-        #fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
-        #plots = []
-
-        ##### Fig 3a
-        # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
-        d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
-                  "e": [E_int/n_habs],
-                  "i":[I_int/n_habs],
-                  "q": [0],
-                  "r": [0]}
-
-        ####
-        #plt.axis('off')
-        #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
-        #plots.append([img])
-        #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
-        time.append(0)
+            #### población infectada o expuesta al tiempo 0
+            pop_i0 = habs[:I_int]
+            pop_e0 = habs[I_int: E_int + I_int]
 
 
 
+            for r,c in pop_i0:
+                arr_population[r][c] = 3
+            for r,c in pop_e0:
+                arr_population[r][c] = 2
+            ####
 
-        for c in range(1,n_cycles):
-            print(c)
-            f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
+            arr_evo = arr_population.copy()
+            arr_nt = arr_tiempo.copy()
 
+            #### tiempo primer infectado ---> t_fi
+            t_fi = 0
+
+            #### gráficas
+            #frac_pers_i = []
+            time = []
+
+            #### ANIMACION
+            cmap = ListedColormap(["black", "blue", "green", "red", "cyan", "yellow"])
+            #fig = plt.figure(dpi = 200, tight_layout = False, constrained_layout = True)
+            #plots = []
+
+            ##### Fig 3a
+            # no hay en cuarentena ni recuperados, solo suceptibles, expuestos e infects
+            d_cont = {"s": [(n_habs - I_int - E_int)/n_habs],
+                      "e": [E_int/n_habs],
+                      "i":[I_int/n_habs],
+                      "q": [0],
+                      "r": [0]}
+
+            ####
             #plt.axis('off')
             #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
             #plots.append([img])
             #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
-
-            d_cont = data_fig3a(n_habs , d_cont, arr_population)
-
-            time.append(c)
-
-        # la información relevante es la que corresponde a los infectados
-        d_data["E_int:"+str(l_E_int[i])+";I_int:"+str(l_I_int[i])] = d_cont["i"]
-
-    ######################################
-
-    # enviar datos a la carpeta de interés
-    file_str = "exportedData/Fig5b.csv"
-    d_data["t"] = time
-    df = pd.DataFrame(d_data)
-    df.to_csv(file_str)
-
-    # consideraremos solo ciertas llaves de interés, no todas, para el plot
-    # relevant keys
-    r_ks = list(d_data.keys())
-    r_ks.remove("t")
+            time.append(0)
 
 
-    fig = df.plot(x = "t", y = r_ks , xlabel = "tiempo (d)",
-            ylabel= "fracción de personas infectadas (i)",
-            title = "Fig 5b" ,
-            color = ["red", "blue", "lime", "cyan", "green"])
-    fig = fig.get_figure()
 
-    fig.savefig("fig5b_D{}.png".format(D))
-    plt.show()
 
-    print("\n----------- ARCHIVO GENERADO-----------\n")
+            for c in range(1,n_cycles):
+                print(c)
+                f_evolution(sz_r, sz_c, d_params, arr_tiempo, arr_nt, arr_population, arr_evo)
+
+                #plt.axis('off')
+                #img = plt.imshow(arr_population, vmin = 0, vmax = 5, cmap = cmap)
+                #plots.append([img])
+                #frac_pers_i.append(sum([rw.count(3) for rw in arr_population])/ int(D * sz_r * sz_c))
+
+                d_cont = data_fig3a(n_habs , d_cont, arr_population)
+
+                time.append(c)
+            d_data["p_I="+str(p_I)] = d_cont["i"]
+
+        ######################################
+
+        # enviar datos a la carpeta de interés
+        file_str = "fig5d_test/D{}.png".format(D)
+        d_data["t"] = time
+        df = pd.DataFrame(d_data)
+        #df.to_csv(file_str)
+
+        # consideraremos solo ciertas llaves de interés, no todas, para el plot
+        # relevant keys
+        r_ks = list(d_data.keys())
+        r_ks.remove("t")
+
+        fig = df.plot(x = "t", y = r_ks, xlabel = "tiempo (d)",
+                ylabel= "fracción de personas infectadas (i)",
+                title = "Fig 5d" ,
+                color = ["red", "blue", "lime", "cyan", "green"]).get_figure()
+
+        fig.savefig(file_str)
+        #plt.show()
+        #print(max(d_cont["i"]))
+
+        #print("\n----------- ARCHIVO GENERADO-----------\n")
 
     # # generar la animación
     # ani = animation.ArtistAnimation(fig, plots, interval=100, blit=True,

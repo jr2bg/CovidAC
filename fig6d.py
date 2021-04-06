@@ -9,7 +9,7 @@ import random
 
 def f_getNeigh(sz_r, sz_c,r,c,d):
     '''
-    función que da la vecindad para el elemento ubicado en
+    funcion que da la vecindad para el elemento ubicado en
     la fila r y columna c
     sz_r y sz_c corresponden al tamaño del array
     d -> radio de la esfera de influencia
@@ -70,8 +70,8 @@ def i_2qr(p_Q, p_R, npa, t_Q, t_R, t):
 
     if t_Q <= t and npa <= p_Q:
         return 4
-
-    if t_R <= t and npa <= p_R:
+    # mejora de la condición para que pase a recuperado
+    if t_R <= t and p_Q < npa <= p_Q+p_R:
         return 5
 
     return 3
@@ -214,23 +214,19 @@ def iterations():
     '''
     PROGRAMA PRINCIPAL
     '''
-    sz_r = 400
-    sz_c = 400
-    #l_D = [0.01 *i**2 for i in range(1, 11)]
-    D = 0.46
-    d = 2
     n_cycles = 100
-
     d_data = {}
 
+    sz_r = 400
+    sz_c = 400
+    D = 0.46
+    d = 2
     l_p_R = [0.001, 0.01 , 0.1,  1]
-
     # inicialización del dic con los valores a considerar
     for i in range(4):
         d_data["p_R=" + str(l_p_R[i])] = []
 
     #####
-    #for D in l_D:
     for p_R in l_p_R:
     ##############################
         # pueden cambiar p_E, p_I, p_Q, p_R y t_Q => t_I y t_R NO CAMBIAN
@@ -329,7 +325,10 @@ def iterations():
     r_ks = list(d_data.keys())
     r_ks.remove("t")
 
-    df.plot(x = "t", y = r_ks, color = ["red", "blue", "lime", "cyan", "green"])
+    df[(df["t"] >= 30) & (df["t"] <= 60)].plot(x = "t", y = r_ks, xlabel = "tiempo (d)",
+            ylabel= "fracción de personas infectadas (i)",
+            title = "Fig 6d" ,
+            color = ["red", "blue", "lime", "cyan", "green"])
     plt.show()
     #print(max(d_cont["i"]))
 

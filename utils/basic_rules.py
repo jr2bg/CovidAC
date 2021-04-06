@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 # este archivo será el usado por todos los demás
 from random import randint, uniform, sample
 
@@ -56,12 +56,12 @@ def e_2_i(p_I, npa, t_I, t):
     return 2
 
 
-def i_2qr(p_Q, p_R, npa, t_Q, t_R, t):
+def i_2qr(p_Q, f_p_R, npa, t_Q, t_R, t):
     '''
     función que determina si la celda en infectado (3) pasa a
     en cuarentena (4) o a recuperado (5)
     p_Q -> probabilidad de pasar a en cuarentena
-    p_R -> probabilidad de pasar a recuperado
+    f_p_R -> función que indica la probabilidad de pasar a R como f(t)
     npa -> número pseudo aleatorio
     t_Q -> tiempo mínimo para entrar a Q
     t_R -> tiempo mínimo para entrar a recuperado
@@ -71,21 +71,21 @@ def i_2qr(p_Q, p_R, npa, t_Q, t_R, t):
     if t_Q <= t and npa <= p_Q:
         return 4
 
-    if t_R <= t and npa <= p_R:
+    if t_R <= t and npa <= f_p_R(t):
         return 5
 
     return 3
 
 
-def q_2_r(p_R, npa, t_R, t):
+def q_2_r(f_p_R, npa, t_R, t):
     '''
     función que determina si de Q (4) pasa a R (5)
-    p_R -> probabilidad de pasar a R
+    f_p_R -> función que indica la probabilidad de pasar a R como f(t)
     npa -> número pseudo aleatorio
     t_R -> tiempo mínimo para que entre a R
     t   -> tiempo que ha pasado en Q
     '''
-    if t_R <= t and npa <= p_R:
+    if t_R <= t and npa <= f_p_R(t):
         return 5
 
     return 4

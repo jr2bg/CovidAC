@@ -10,6 +10,55 @@ import pandas as pd
 
 import numpy as np
 
+# Probabilidad de que una persona que estuvo en contacto con una persona contagiada
+# pase a expuesto
+# https://www.news18.com/news/lifestyle/for-how-long-a-covid-19-patient-can-infect-others-myupchar-2888611.html
+def f_p_E(R_0, D, d, t_infeccioso = 10):
+    # número de personas que pudieron entrar en contacto con alguien
+    n_p = D * ((2 * d +1 ) **2 -1)
+    
+    return R_0 / (n_p * t_infeccioso)
+
+
+# probabilidad de que E pase a I
+# lauer etal 2020
+# consideraremos los siguientes valores obtenidos de tratar de reproducir la
+# gráfica del artículo de Lauer etal 2020
+# Se calculará al principio
+def f_p_I(s= 0.465, loc = 0, scale = 5.5, fst_q = 0.0001, last_q = 0.9999):
+    
+    st = lognorm.ppf(fst_q, s, scale = scale)
+    nd = lognorm.ppf(lst_q, s, scale = scale)
+    
+    x_cont = np.linspace(st,nd,100)
+    lognm_pdf = lognorm.pdf(x_cont,s, loc, scale)
+    
+    # convertimos a una lista de enteros con índices los días y 
+    # las entradas los valores de la probabilidad
+    # prob_days[i] = sum ( lognm_pdf[j] | x_cont[j] = i div) / cont
+    prob_days = []
+    i = 0
+    sm = 0
+    cont = 0
+    
+    for j in range(len(x_cont)):
+        
+        # función monótona creciente
+        if i <= x_cont[j] < i+1:
+            sm += lognm_pdf[j]
+            cont += 1
+        else:
+            prob_days.append(sm / cont)
+            i += 1
+            cont = 1
+            sm = lognm_pdf[j]
+    
+    # la última prob se debe anexar al terminar de ejecutarse el código
+    prob_days.append(sm / cont)
+    
+    return prob_days
+    
+
 
 ## Probabilidad de recuperación.
 ## barman etal 2020
@@ -52,7 +101,10 @@ def iterations():
     # reproduction rate
     R_0 = 1.15
     t_infecc = 10
-
+    
+    
+    # probabilidad de E -> I
+    l_p_I = f_p_I()
 
 
 
@@ -68,22 +120,31 @@ def iterations():
             # número de personas distintas con las que tiene contacto una persona
             # en este caso,
             n_p = D * (2*d + 1)**2
-
+            
+            # probabilidad S -> E
             p_E = R_0 / (n_p * t_infecc)
 
-            p_I =  0.5
+            #p_I =  0.5
             t_I = 8     ####
             p_Q =  0.1
             t_Q =  2    ####
-            p_R = 0.12
+            #p_R = 0.12
             t_R = 18
             #d = 2
             t_L = inf
             d_variable = False
 
-            d_params = {"p_E" :  p_E, "p_I" :  p_I, "t_I" : t_I, "p_Q" :  p_Q,
-                        "t_Q" :  t_Q, "p_R" : p_R, "t_R" : t_R, "d" : d,
-                         "t_L" : t_L, "t":0, "d_variable":d_variable}
+            d_params = {"p_E" :  p_E, 
+                        "p_I" :  l_p_I,         # pasamos toda la lista
+                        "t_I" : t_I, 
+                        "p_Q" :  p_Q,
+                        "t_Q" :  t_Q, 
+                        "p_R" : f_p_R,          # pasamos la función como key
+                        "t_R" : t_R, 
+                        "d" : d,
+                        "t_L" : t_L, 
+                        "t":0, 
+                        "d_variable":d_variable}
 
             # personas infectadas y expuestas al principio
             I_int = 6

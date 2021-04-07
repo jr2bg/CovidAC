@@ -7,6 +7,7 @@ from matplotlib.colors import ListedColormap
 
 from math import inf
 import pandas as pd
+from scipy.stats import lognorm
 
 import numpy as np
 
@@ -25,7 +26,7 @@ def f_p_E(R_0, D, d, t_infeccioso = 10):
 # consideraremos los siguientes valores obtenidos de tratar de reproducir la
 # gráfica del artículo de Lauer etal 2020
 # Se calculará al principio
-def f_p_I(s= 0.465, loc = 0, scale = 5.5, fst_q = 0.0001, last_q = 0.9999):
+def f_p_I(s= 0.465, loc = 0, scale = 5.5, fst_q = 0.0001, lst_q = 0.9999):
     
     st = lognorm.ppf(fst_q, s, scale = scale)
     nd = lognorm.ppf(lst_q, s, scale = scale)
@@ -92,7 +93,7 @@ def iterations():
     '''
     sz_r = 400
     sz_c = 400
-    l_D = [0.5]
+    l_D = [0.2,0.3,0.4,0.5,0.6,0.7]
     l_d = [1,2]
     n_cycles = 100
     imx_1 = []
@@ -109,7 +110,7 @@ def iterations():
 
 
 
-    lgnormal = np.random.lognormal(lgnml_mu, lgnml_sigma2, 100)
+    #lgnormal = np.random.lognormal(lgnml_mu, lgnml_sigma2, 100)
 
     #####
     for D in l_D:

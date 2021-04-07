@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # este archivo será el usado por todos los demás
 from random import randint, uniform, sample
+import numpy as np
+from scipy.stats import lognorm
 
 def f_getNeigh(sz_r, sz_c,r,c,d, d_variable = True):
     '''
@@ -42,14 +44,21 @@ def s_2_e(p_E, npa, ng, arr_population):
     return 1    # queda en Suceptible
 
 
-def e_2_i(p_I, npa, t_I, t):
+def e_2_i(l_p_I, npa, t_I, t):
     '''
     función que determina si la celda pasa de Expuesto (2) a Infectado (3)
     p_I -> probabilidad de pasar a infectado
     npa -> número pseudo aleatorio
     t_I -> tiempo mínimo de permanencia en expuesto
-    t -> tiempo que ha pasado la celda en Expuesto
+    t -> tiempo que la celda ha pasado en Expuesto
     '''
+    # si el tiempo que ha pasado la celda en Expuesto es mayor a la cantidad
+    # de entradas en la lista, consideramos el valor de la última entrada--->??
+    #   ----->>> POR QUÉ??
+    if t >= len(l_p_I):
+        p_I = l_p_I[-1]
+    else:
+        p_I = l_p_I[t]
 
     if t_I <= t and npa <= p_I:
         return 3
@@ -218,3 +227,86 @@ def data_exp(n_habs , d_cont,arr_population):
     d_cont["r"].append(r / n_habs)
 
     return d_cont
+
+
+################################
+########################## 
+#############              PROBABILIDADES DE TRANSICIÓN
+##########################
+################################
+
+
+# Probabilidad de que una persona que estuvo en contacto con una persona contagiada
+# pase a expuesto
+# https://www.news18.com/news/lifestyle/for-how-long-a-covid-19-patient-can-infect-others-myupchar-2888611.html
+def f_p_E(R_0, D, d, t_infeccioso = 10):
+    # número de personas que pudieron entrar en contacto con alguien
+    n_p = D * ((2 * d + 1 ) **2 -1)
+    
+    return R_0 / (n_p * t_infeccioso)
+
+
+# probabilidad de que E pase a I
+# lauer etal 2020
+# consideraremos los siguientes valores obtenidos de tratar de reproducir la
+# gráfica del artículo de Lauer etal 2020
+# Se calculará al principio
+def f_p_I(s= 0.465, loc = 0, scale = 5.5, fst_q = 0.0001, lst_q = 0.9999):
+    
+    st = lognorm.ppf(fst_q, s, scale = scale)
+    nd = lognorm.ppf(lst_q, s, scale = scale)
+    
+    x_cont = np.linspace(st,nd,100)
+    lognm_pdf = lognorm.pdf(x_cont,s, loc, scale)
+    
+    # convertimos a una lista de enteros con índices los días y 
+    # las entradas los valores de la probabilidad
+    # prob_days[i] = sum ( lognm_pdf[j] | x_cont[j] = i div) / cont
+    prob_days = []
+    i = 0
+    sm = 0
+    cont = 0
+    
+    for j in range(len(x_cont)):
+        
+        # función monótona creciente
+        if i <= x_cont[j] < i+1:
+            sm += lognm_pdf[j]
+            cont += 1
+        else:
+            prob_days.append(sm / cont)
+            i += 1
+            cont = 1
+            sm = lognm_pdf[j]
+    
+    # la última prob se debe anexar al terminar de ejecutarse el código
+    prob_days.append(sm / cont)
+    
+    return prob_days
+    
+
+
+## Probabilidad de recuperación.
+## barman etal 2020
+def f_p_R(t):
+    ## no aparece probabilidad de recuperación
+    if t < 10:
+        return 0
+    elif 10 <=t < 15:
+        return 0.046512
+    elif 15 <= t < 18:
+        return 0.293023
+    elif 18 <= t < 20:
+        return 0.395349
+    elif 20 <= t < 21:
+        return 0.465116
+    elif 21 <= t < 23:
+        return 0.465116
+    elif 23 <= t < 25:
+        return 0.477419
+    elif 25 <= t < 27:
+        return 0.534884
+    elif 27 <= t < 37:
+        return 0.557634
+    elif t >= 37:
+        return 0.557634
